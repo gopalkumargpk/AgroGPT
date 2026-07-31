@@ -1,4 +1,5 @@
 from langchain_core.prompts import ChatPromptTemplate
+import streamlit as st
 
 from src.llm import get_llm
 from src.retriever import get_retriever
@@ -9,20 +10,23 @@ def ask_question(question: str):
     llm = get_llm()
     retriever = get_retriever()
 
-    docs = retriever.invoke(question)
+    # Retrieve documents
+    docs = retriever.get_relevant_documents(question)
 
-    print("\n========== RETRIEVED DOCUMENTS ==========\n")
+    # Debug Information
+    st.subheader("📄 Debug Information")
+    st.write("Retrieved Documents:", len(docs))
 
     for i, doc in enumerate(docs, start=1):
-        print(f"\n----------- Document {i} -----------")
-        print("Source:", doc.metadata.get("source", "Unknown"))
-        print(doc.page_content[:500])
+        st.write(f"### Document {i}")
+        st.write("Source:", doc.metadata.get("source", "Unknown"))
+        st.write(doc.page_content[:500])
 
-    print("\n=========================================\n")
-
+    # No documents found
     if not docs:
         return "I couldn't find any relevant information in the uploaded agriculture documents."
 
+    # Build context
     context = "\n\n".join(doc.page_content for doc in docs)
 
     prompt = ChatPromptTemplate.from_template(
