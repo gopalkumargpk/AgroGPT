@@ -9,7 +9,7 @@ __pycache__/
 .env
 
 # FAISS Vector Database
-database/faiss_index/
+
 
 # VS Code
 .vscode/
